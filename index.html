@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Tembea Laikipia — Smart Community Tourism</title>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#c8963e"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-title" content="Tembea Laikipia"/>
+  <meta name="description" content="Smart community-based tourism platform for inclusive economic growth in Laikipia, Kenya."/>
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png"/>
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+
+  <!-- ══ TOASTS ══════════════════════════════════════════════ -->
+  <div class="success-toast" id="successToast"></div>
+  <div class="offline-toast" id="offlineToast" hidden>📵 Offline — showing cached data</div>
+
+  <!-- ══ REVIEW MODAL ═══════════════════════════════════════ -->
+  <div class="modal-backdrop" id="reviewModal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <div class="modal-label">Leave a Review</div>
+          <h3 class="modal-title" id="modalExpName"></h3>
+        </div>
+        <button class="modal-close" id="modalCloseBtn">✕</button>
+      </div>
+      <div class="modal-section">
+        <label class="modal-field-label">Your Rating <span class="required">*</span></label>
+        <div class="modal-stars">
+          <span class="modal-star" data-val="1">☆</span>
+          <span class="modal-star" data-val="2">☆</span>
+          <span class="modal-star" data-val="3">☆</span>
+          <span class="modal-star" data-val="4">☆</span>
+          <span class="modal-star" data-val="5">☆</span>
+        </div>
+        <div class="star-labels"><span>Poor</span><span>Fair</span><span>Good</span><span>Great</span><span>Excellent</span></div>
+      </div>
+      <div class="modal-section">
+        <label class="modal-field-label" for="reviewName">Your Name <span class="required">*</span></label>
+        <input class="modal-input" id="reviewName" type="text" placeholder="e.g. Jane Wanjiku" maxlength="60"/>
+      </div>
+      <div class="modal-section">
+        <label class="modal-field-label" for="reviewText">Your Review <span class="optional">(optional)</span></label>
+        <textarea class="modal-textarea" id="reviewText" rows="4" placeholder="Tell other tourists what made this experience special..."></textarea>
+      </div>
+      <p class="review-error" id="reviewError"></p>
+      <button class="modal-submit-btn" id="submitReviewBtn">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:white;vertical-align:middle;margin-right:6px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Submit & Send to Guide
+      </button>
+      <p class="modal-wa-note">Your review is saved on the platform and delivered to the guide's WhatsApp.</p>
+    </div>
+  </div>
+
+  <!-- ══ BOOKING MODAL ══════════════════════════════════════ -->
+  <div class="modal-backdrop" id="bookingModal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div>
+          <div class="modal-label">Book Experience</div>
+          <h3 class="modal-title" id="bookingExpName"></h3>
+        </div>
+        <button class="modal-close" id="bookingCloseBtn">✕</button>
+      </div>
+      <div class="modal-section">
+        <label class="modal-field-label" for="bookingName">Full Name <span class="required">*</span></label>
+        <input class="modal-input" id="bookingName" type="text" placeholder="Jane Wanjiku"/>
+      </div>
+      <div class="booking-row">
+        <div class="modal-section">
+          <label class="modal-field-label" for="bookingDate">Preferred Date <span class="required">*</span></label>
+          <input class="modal-input" id="bookingDate" type="date"/>
+        </div>
+        <div class="modal-section">
+          <label class="modal-field-label" for="bookingPeople">No. of People <span class="required">*</span></label>
+          <input class="modal-input" id="bookingPeople" type="number" min="1" max="20" value="1"/>
+        </div>
+      </div>
+      <div class="modal-section">
+        <label class="modal-field-label" for="bookingPhone">Your WhatsApp Number <span class="required">*</span></label>
+        <input class="modal-input" id="bookingPhone" type="tel" placeholder="e.g. 0712345678"/>
+      </div>
+      <!-- M-Pesa Demo Section -->
+      <div class="mpesa-section">
+        <div class="mpesa-header">
+          <span class="mpesa-logo">M-PESA</span>
+          <span class="mpesa-tag">Payment Demo</span>
+        </div>
+        <div class="mpesa-amount" id="mpesaAmount">Total: KES 0</div>
+        <div class="mpesa-steps">
+          <div class="mpesa-step active" id="mstep1">1. Enter Details</div>
+          <div class="mpesa-step" id="mstep2">2. Pay via M-Pesa</div>
+          <div class="mpesa-step" id="mstep3">3. Confirmed ✓</div>
+        </div>
+        <div id="mpesaPayArea" hidden>
+          <input class="modal-input" id="mpesaPhone" type="tel" placeholder="M-Pesa number e.g. 0712345678"/>
+          <p class="mpesa-note">An STK Push will be sent to your phone. Enter your M-Pesa PIN to confirm.</p>
+        </div>
+      </div>
+      <p class="review-error" id="bookingError"></p>
+      <button class="modal-submit-btn" id="bookingNextBtn" style="background:var(--moss)">Proceed to Payment →</button>
+    </div>
+  </div>
+
+  <!-- ══ TRIP PLANNER MODAL ═════════════════════════════════ -->
+  <div class="modal-backdrop" id="plannerModal" role="dialog" aria-modal="true">
+    <div class="modal-box modal-box--wide">
+      <div class="modal-header">
+        <div>
+          <div class="modal-label">🧠 AI Trip Planner</div>
+          <h3 class="modal-title">Plan My Laikipia Trip</h3>
+        </div>
+        <button class="modal-close" id="plannerCloseBtn">✕</button>
+      </div>
+      <!-- Step 1: Preferences -->
+      <div id="plannerStep1">
+        <div class="planner-grid">
+          <div class="modal-section">
+            <label class="modal-field-label">Budget per person (KES)</label>
+            <select class="modal-input" id="planBudget">
+              <option value="5000">Under KES 5,000</option>
+              <option value="10000" selected>KES 5,000 – 10,000</option>
+              <option value="20000">KES 10,000 – 20,000</option>
+              <option value="50000">KES 20,000+</option>
+            </select>
+          </div>
+          <div class="modal-section">
+            <label class="modal-field-label">Trip Duration</label>
+            <select class="modal-input" id="planDays">
+              <option value="1">1 Day</option>
+              <option value="2" selected>2 Days</option>
+              <option value="3">3 Days</option>
+              <option value="5">5 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-section">
+          <label class="modal-field-label">Interests (select all that apply)</label>
+          <div class="interest-chips">
+            <label class="chip-label"><input type="checkbox" value="Wildlife" checked/> 🦏 Wildlife</label>
+            <label class="chip-label"><input type="checkbox" value="Adventure"/> 🏕️ Adventure</label>
+            <label class="chip-label"><input type="checkbox" value="Nature"/> 🌿 Nature</label>
+            <label class="chip-label"><input type="checkbox" value="Conservation"/> 🌍 Conservation</label>
+          </div>
+        </div>
+        <div class="modal-section">
+          <label class="modal-field-label">Group Size</label>
+          <input class="modal-input" id="planGroupSize" type="number" min="1" max="20" value="2"/>
+        </div>
+        <button class="modal-submit-btn" id="generatePlanBtn" style="background:var(--moss)">✨ Generate My Itinerary</button>
+      </div>
+      <!-- Step 2: Result -->
+      <div id="plannerStep2" hidden>
+        <div class="itinerary-result" id="itineraryResult"></div>
+        <div class="planner-actions">
+          <button class="modal-submit-btn" id="downloadItineraryBtn" style="background:var(--savanna)">⬇ Download PDF Itinerary</button>
+          <button class="modal-submit-btn" id="planAgainBtn" style="background:transparent;color:var(--earth);border:1.5px solid var(--savanna)">← Plan Again</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NAVBAR ═════════════════════════════════════════════ -->
+  <nav class="navbar" id="mainNav">
+    <div class="nav-inner">
+      <div class="nav-logo">
+        <span class="logo-icon">🌍</span>
+        <div>
+          <div class="logo-title">Tembea Laikipia</div>
+          <div class="logo-sub">Smart Community Tourism</div>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="#experiences">Experiences</a></li>
+        <li><a href="#planner-section">Trip Planner</a></li>
+        <li><a href="#impact">Impact</a></li>
+        <li><a href="#tvet">TVET Skills</a></li>
+        <li><a href="#marketplace">Marketplace</a></li>
+      </ul>
+      <button class="nav-cta" onclick="openPlannerModal()">Plan My Trip ✨</button>
+    </div>
+  </nav>
+
+  <!-- ══ HERO ═══════════════════════════════════════════════ -->
+  <header class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🏆 Smart Tourism System · Laikipia County, Kenya</div>
+      <h1 class="hero-title">Wild.<br/><em>Authentic.</em><br/>Unforgettable.</h1>
+      <p class="hero-desc">A smart digital ecosystem connecting tourists with local Laikipia guides — driving youth employment, conservation, and inclusive economic growth.</p>
+      <div class="hero-ctas">
+        <a href="#experiences" class="hero-btn">Explore Experiences</a>
+        <button class="hero-btn hero-btn--outline" onclick="openPlannerModal()">✨ Plan My Trip</button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num">5</span><span class="stat-label">Experiences</span></div>
+      <div class="stat"><span class="stat-num">4.68★</span><span class="stat-label">Avg Rating</span></div>
+      <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Local Guides</span></div>
+      <div class="stat"><span class="stat-num">KES 2.1M</span><span class="stat-label">Income Generated</span></div>
+    </div>
+  </header>
+
+  <!-- ══ AI TRIP PLANNER BANNER ═════════════════════════════ -->
+  <section class="planner-banner" id="planner-section">
+    <div class="planner-banner-inner">
+      <div class="planner-banner-text">
+        <span class="planner-banner-icon">🧠</span>
+        <div>
+          <h3>AI-Powered Trip Planner</h3>
+          <p>Tell us your budget, interests and group size — we'll auto-generate a personalised Laikipia itinerary.</p>
+        </div>
+      </div>
+      <button class="planner-banner-btn" onclick="openPlannerModal()">Plan My Trip →</button>
+    </div>
+  </section>
+
+  <!-- ══ FILTER + EXPERIENCES ══════════════════════════════ -->
+  <section class="filter-bar" id="experiences">
+    <div class="filter-inner">
+      <span class="filter-label">Filter by:</span>
+      <div class="filter-pills">
+        <button class="pill active" data-filter="all">All</button>
+        <button class="pill" data-filter="Wildlife">Wildlife</button>
+        <button class="pill" data-filter="Adventure">Adventure</button>
+        <button class="pill" data-filter="Nature">Nature</button>
+        <button class="pill" data-filter="Conservation">Conservation</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="experiences-section">
+    <div class="section-heading">
+      <h2>Our Experiences</h2>
+      <p>Book directly with your guide — no middleman, no markup.</p>
+    </div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </main>
+
+  <!-- ══ COMMUNITY IMPACT DASHBOARD ════════════════════════ -->
+  <section class="impact-section" id="impact">
+    <div class="impact-inner">
+      <div class="section-heading-light">
+        <div class="section-badge">🌍 Community Impact Dashboard</div>
+        <h2>Real People. Real Change.</h2>
+        <p>Every booking directly supports Laikipia's communities, conservation, and youth empowerment.</p>
+      </div>
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="impact-icon">🏘️</div>
+          <div class="impact-num" data-target="48">0</div>
+          <div class="impact-label">Local Businesses Onboarded</div>
+          <div class="impact-bar"><div class="impact-bar-fill" style="width:78%"></div></div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">👩‍💼</div>
+          <div class="impact-num" data-target="312">0</div>
+          <div class="impact-label">Youth & Women Benefiting</div>
+          <div class="impact-bar"><div class="impact-bar-fill" style="width:65%"></div></div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">💰</div>
+          <div class="impact-num" data-target="2100000" data-prefix="KES " data-format="money">0</div>
+          <div class="impact-label">Estimated Income Generated</div>
+          <div class="impact-bar"><div class="impact-bar-fill" style="width:55%"></div></div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">🌳</div>
+          <div class="impact-num" data-target="1840">0</div>
+          <div class="impact-label">Trees Planted via Eco-Bookings</div>
+          <div class="impact-bar"><div class="impact-bar-fill" style="width:42%"></div></div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">🦏</div>
+          <div class="impact-num" data-target="94">0</div>
+          <div class="impact-label">Conservation Sites Supported</div>
+          <div class="impact-bar"><div class="impact-bar-fill" style="width:70%"></div></div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-icon">🎓</div>
+          <div class="impact-num" data-target="127">0</div>
+          <div class="impact-label">TVET Students Placed</div>
+          <div class="impact-bar"><div class="impact-bar-fill" style="width:60%"></div></div>
+        </div>
+      </div>
+      <!-- SDG Badges -->
+      <div class="sdg-row">
+        <div class="sdg-badge sdg-8">SDG 8<br/><span>Decent Work</span></div>
+        <div class="sdg-badge sdg-10">SDG 10<br/><span>Reduced Inequalities</span></div>
+        <div class="sdg-badge sdg-13">SDG 13<br/><span>Climate Action</span></div>
+        <div class="sdg-badge sdg-15">SDG 15<br/><span>Life on Land</span></div>
+        <div class="sdg-badge sdg-17">SDG 17<br/><span>Partnerships</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ TVET SKILLS SECTION ════════════════════════════════ -->
+  <section class="tvet-section" id="tvet">
+    <div class="tvet-inner">
+      <div class="section-heading">
+        <div class="section-badge-dark">🎓 Skills Behind the Experience</div>
+        <h2>Education → Skills → Income → Tourism</h2>
+        <p>Every experience on this platform is powered by TVET-trained local talent.</p>
+      </div>
+      <div class="tvet-grid">
+        <div class="tvet-card">
+          <div class="tvet-emoji">🧭</div>
+          <h4>Tour Guiding Trainees</h4>
+          <p>Students from Nanyuki and Nyahururu TVET colleges trained in wildlife interpretation, safety and customer experience.</p>
+          <div class="tvet-stat">34 active trainees</div>
+        </div>
+        <div class="tvet-card">
+          <div class="tvet-emoji">🍽️</div>
+          <h4>Hospitality Students</h4>
+          <p>Catering and accommodation management students providing world-class service at community lodges and campsites.</p>
+          <div class="tvet-stat">58 active trainees</div>
+        </div>
+        <div class="tvet-card">
+          <div class="tvet-emoji">🎨</div>
+          <h4>Local Artisans</h4>
+          <p>Maasai and Samburu craftspeople trained in product packaging, pricing, and digital selling for the tourism marketplace.</p>
+          <div class="tvet-stat">41 artisans onboarded</div>
+        </div>
+        <div class="tvet-card">
+          <div class="tvet-emoji">💻</div>
+          <h4>Digital Skills Trainees</h4>
+          <p>Youth trained in web design, social media marketing and digital bookings to manage and grow the platform locally.</p>
+          <div class="tvet-stat">22 digital trainees</div>
+        </div>
+      </div>
+      <div class="tvet-cta">
+        <p>Are you a TVET student or institution in Laikipia?</p>
+        <a class="hero-btn" href="https://wa.me/254700000000?text=Hello%2C%20I%20am%20interested%20in%20joining%20the%20Tembea%20Laikipia%20TVET%20programme." target="_blank">Join the Programme →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MARKETPLACE ════════════════════════════════════════ -->
+  <section class="marketplace-section" id="marketplace">
+    <div class="marketplace-inner">
+      <div class="section-heading">
+        <div class="section-badge-dark">🤝 Local Marketplace</div>
+        <h2>Take Laikipia Home With You</h2>
+        <p>Authentic crafts, produce and cultural products made by Laikipia communities.</p>
+      </div>
+      <div class="market-grid" id="marketGrid"></div>
+    </div>
+  </section>
+
+  <!-- ══ HOW IT WORKS ═══════════════════════════════════════ -->
+  <section class="how-it-works" id="about">
+    <div class="hiw-inner">
+      <h2>How It Works</h2>
+      <div class="steps">
+        <div class="step"><div class="step-icon">🔍</div><h3>Browse</h3><p>Explore curated experiences and filter by interest or budget.</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step"><div class="step-icon">🧠</div><h3>Plan</h3><p>Use the AI Trip Planner to auto-generate a personalised itinerary.</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step"><div class="step-icon">💳</div><h3>Book & Pay</h3><p>Book directly with the guide and pay via M-Pesa — fast and secure.</p></div>
+        <div class="step-arrow">→</div>
+        <div class="step"><div class="step-icon">🌿</div><h3>Experience</h3><p>Show up, go wild. Leave a review and support the community.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FOOTER ═════════════════════════════════════════════ -->
+  <footer class="footer" id="contact">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">🌍 Tembea Laikipia</div>
+        <p>A smart digital ecosystem for community-based tourism and TVET-driven economic empowerment in Laikipia County, Kenya.</p>
+        <div class="footer-sdgs">
+          <span>🎯 SDG 8</span><span>🌍 SDG 13</span><span>🌿 SDG 15</span>
+        </div>
+      </div>
+      <div class="footer-links">
+        <h4>Platform</h4>
+        <a href="#experiences">Experiences</a>
+        <a href="#planner-section">Trip Planner</a>
+        <a href="#impact">Impact Dashboard</a>
+        <a href="#tvet">TVET Skills</a>
+        <a href="#marketplace">Marketplace</a>
+      </div>
+      <div class="footer-links">
+        <h4>Contact</h4>
+        <a href="mailto:info@tembealaikpia.co.ke">info@tembealaikpia.co.ke</a>
+        <a href="https://wa.me/254700000000" target="_blank">WhatsApp Us</a>
+        <p style="color:rgba(248,242,232,0.35);font-size:13px;margin-top:8px">Laikipia County, Kenya</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Tembea Laikipia · Smart Community Tourism Platform · All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
