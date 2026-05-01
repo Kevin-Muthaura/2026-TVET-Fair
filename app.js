@@ -84,12 +84,66 @@ const experiences = [
 ];
 
 const marketplaceItems = [
-  { id: 1, name: "Maasai Beaded Bracelet", price: 850, artisan: "Naserian Sankale", emoji: "📿", category: "Crafts" },
-  { id: 2, name: "Hand-woven Kikoi", price: 1500, artisan: "Wanjiku Mwangi", emoji: "🧣", category: "Textiles" },
-  { id: 3, name: "Organic Laikipia Honey", price: 600, artisan: "Kamau Njoroge", emoji: "🍯", category: "Food" },
-  { id: 4, name: "Carved Soapstone Bowl", price: 1200, artisan: "Ochieng Otieno", emoji: "🪨", category: "Art" },
-  { id: 5, name: "Samburu Leather Sandals", price: 2000, artisan: "Lketinga Leparmarai", emoji: "👡", category: "Fashion" },
-  { id: 6, name: "Baobab Body Oil (100ml)", price: 750, artisan: "Fatuma Hassan", emoji: "🌿", category: "Wellness" },
+  {
+    id: 1,
+    name: "Maasai Beaded Bracelet",
+    price: 850,
+    artisan: "Kevin Muthaura",
+    phone: "254714974036",
+    emoji: "📿",
+    category: "Crafts",
+    description: "Handcrafted by Laikipia community artisans using traditional Maasai beading techniques. Each piece is unique.",
+  },
+  {
+    id: 2,
+    name: "Hand-woven Kikoi Wrap",
+    price: 1500,
+    artisan: "Wamai Wairimu",
+    phone: "254792098960",
+    emoji: "🧣",
+    category: "Textiles",
+    description: "Vibrant, locally woven kikoi fabric from Laikipia. Perfect as a beach wrap, scarf or wall hanging.",
+  },
+  {
+    id: 3,
+    name: "Organic Laikipia Honey (500g)",
+    price: 600,
+    artisan: "Juliet Gichuru",
+    phone: "254717194081",
+    emoji: "🍯",
+    category: "Food",
+    description: "Pure raw honey harvested from wild beehives in Laikipia's indigenous forests. Unprocessed and naturally sweet.",
+  },
+  {
+    id: 4,
+    name: "Hand-carved Soapstone Bowl",
+    price: 1200,
+    artisan: "Laith Smychus",
+    phone: "254791388040",
+    emoji: "🪨",
+    category: "Art",
+    description: "Intricately carved soapstone bowl made by Laikipia craftsmen. A beautiful and functional piece of African art.",
+  },
+  {
+    id: 5,
+    name: "Samburu Leather Sandals",
+    price: 2000,
+    artisan: "Ken Obuya",
+    phone: "254799295884",
+    emoji: "👡",
+    category: "Fashion",
+    description: "Handstitched leather sandals in the traditional Samburu style. Durable, comfortable and authentically Kenyan.",
+  },
+  {
+    id: 6,
+    name: "Baobab Body Oil (100ml)",
+    price: 750,
+    artisan: "Kevin Muthaura",
+    phone: "254714974036",
+    emoji: "🌿",
+    category: "Wellness",
+    description: "Cold-pressed baobab seed oil sourced from Laikipia's ancient baobab trees. Nourishing for skin and hair.",
+  },
 ];
 
 // ── STORAGE ─────────────────────────────────────────────────
@@ -270,24 +324,26 @@ function renderCards(filter) {
 
 function renderMarketplace() {
   const grid = document.getElementById("marketGrid");
-  grid.innerHTML = marketplaceItems.map(item => `
-    <div class="market-card">
-      <div class="market-emoji">${item.emoji}</div>
-      <div class="market-body">
-        <div class="market-category">${item.category}</div>
-        <h4 class="market-name">${item.name}</h4>
-        <div class="market-artisan">by ${item.artisan}</div>
-        <div class="market-price">KES ${item.price.toLocaleString()}</div>
-        <a class="market-btn"
-          href="https://wa.me/254700000000?text=${encodeURIComponent(`Hello, I'd like to order: ${item.name} (KES ${item.price}) by ${item.artisan}. Please send me details.`)}"
-          target="_blank" rel="noopener">
-          🛒 Order via WhatsApp
-        </a>
+  grid.innerHTML = marketplaceItems.map(item => {
+    const msg = `Hello! I saw *${item.name}* (KES ${item.price.toLocaleString()}) on the Tembea Laikipia Marketplace and I'd like to order. Please send me more details.`;
+    const waLink = `https://wa.me/${item.phone}?text=${encodeURIComponent(msg)}`;
+    return `
+      <div class="market-card">
+        <div class="market-emoji">${item.emoji}</div>
+        <div class="market-body">
+          <div class="market-category">${item.category}</div>
+          <h4 class="market-name">${item.name}</h4>
+          <p class="market-desc">${item.description}</p>
+          <div class="market-artisan">🧑‍🎨 ${item.artisan} · Laikipia</div>
+          <div class="market-price">KES ${item.price.toLocaleString()}</div>
+          <a class="market-btn" href="${waLink}" target="_blank" rel="noopener noreferrer">
+            🛒 Order via WhatsApp
+          </a>
+        </div>
       </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 }
-
 // ── REVIEW MODAL ────────────────────────────────────────────
 
 let currentExpId = null;

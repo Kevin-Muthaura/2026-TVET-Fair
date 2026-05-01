@@ -1,0 +1,40 @@
+{
+  "name": "Tembea Laikipia",
+  "short_name": "Tembea Laikipia",
+  "description": "Discover and book authentic community-led wildlife, cultural, and adventure experiences in Laikipia, Kenya — directly with local guides.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a0e06",
+  "theme_color": "#c8963e",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["travel", "lifestyle", "tourism"],
+  "icons": [
+    { "src": "icons/icon-72x72.png",   "sizes": "72x72",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-96x96.png",   "sizes": "96x96",   "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-128x128.png", "sizes": "128x128", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-144x144.png", "sizes": "144x144", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-152x152.png", "sizes": "152x152", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Tembea Laikipia Home Screen"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Experiences",
+      "short_name": "Experiences",
+      "description": "Jump straight to all experiences",
+      "url": "/#experiences",
+      "icons": [{ "src": "icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}
