@@ -565,7 +565,13 @@ function generateItinerary() {
   const trnCostPerDay = chosenTrn ? parseInt(chosenTrn.priceRange.replace("KES ", "").split("–")[0].replace(/,/g, "")) : 0;
   const expCostTotal = dayPlans.reduce((sum, d) => sum + d.experiences.reduce((s, e) => s + e.price, 0), 0);
   const totalCost = ((accCostPerNight * days) + (foodCostPerDay * days) + (trnCostPerDay * days) + expCostTotal) * groupSize;
-  const totalCarbon = dayPlans.reduce((sum, d) => sum + d.experiences.reduce((s, e) => s + e.carbon, 0), 0);
+
+  // ── Cumulative carbon: sum of ALL experiences across ALL days × group size ──
+  // Each experience's carbon is per person, so multiply by groupSize for full trip footprint
+  const allScheduledExps = dayPlans.flatMap(d => d.experiences);
+  const carbonPerPerson = allScheduledExps.reduce((sum, e) => sum + e.carbon, 0);
+  const totalCarbon = Math.round(carbonPerPerson * groupSize * 10) / 10;
+  const treesToPlant = Math.ceil(totalCarbon / 5); // 1 tree offsets ~5 kg CO₂
 
   // ── Build itinerary HTML ──
   let html = `
@@ -574,7 +580,7 @@ function generateItinerary() {
       <div class="itinerary-meta">
         <span>👥 ${groupSize} person${groupSize > 1 ? "s" : ""}</span>
         <span>💰 Est. KES ${totalCost.toLocaleString()} total</span>
-        <span>🌱 ${totalCarbon.toFixed(1)} kg CO₂</span>
+        <span>🌱 ${totalCarbon.toFixed(1)} kg CO₂ total</span>
         ${ownerPref !== "any" ? `<span class="itin-pref-badge">✅ ${ownerPref}-owned priority</span>` : ""}
       </div>
     </div>
@@ -662,6 +668,7 @@ function generateItinerary() {
               <div class="itin-exp-name">${exp.name}</div>
               <div class="itin-exp-loc">📍 ${exp.location}</div>
               <div class="itin-exp-meta">⏱ ${exp.duration} · KES ${exp.price.toLocaleString()}/person · ${exp.guide.name}</div>
+              <div class="itin-exp-carbon">🌱 ${exp.carbon} kg CO₂/person</div>
             </div>
           </div>`;
       });
@@ -681,7 +688,22 @@ function generateItinerary() {
     </div>
     <div class="itin-summary">
       <div class="itin-tip">💡 <strong>Tip:</strong> Book each provider directly via their WhatsApp button for the best rate and personalised service.</div>
-      <div class="carbon-tracker">🌱 <strong>Carbon:</strong> ${totalCarbon.toFixed(1)} kg CO₂ for activities. Consider planting ${Math.ceil(totalCarbon / 5)} trees to offset your journey!</div>
+      <div class="carbon-breakdown">
+        <div class="carbon-breakdown-title">🌱 Cumulative Carbon Footprint Breakdown</div>
+        ${allScheduledExps.map(e => `
+          <div class="carbon-row">
+            <span>${e.emoji} ${e.name}</span>
+            <span>${e.carbon} kg CO₂/person × ${groupSize} = <strong>${Math.round(e.carbon * groupSize * 10) / 10} kg</strong></span>
+          </div>
+        `).join("")}
+        <div class="carbon-row carbon-total-row">
+          <span>🌍 Total CO₂ (${allScheduledExps.length} experience${allScheduledExps.length !== 1 ? "s" : ""}, ${groupSize} person${groupSize > 1 ? "s" : ""})</span>
+          <span><strong>${totalCarbon.toFixed(1)} kg CO₂</strong></span>
+        </div>
+        <div class="carbon-offset-note">
+          🌳 To offset <strong>${totalCarbon.toFixed(1)} kg CO₂</strong>, consider planting <strong>${treesToPlant} tree${treesToPlant !== 1 ? "s" : ""}</strong> in Laikipia's reforestation programme.
+        </div>
+      </div>
     </div>
   `;
 
